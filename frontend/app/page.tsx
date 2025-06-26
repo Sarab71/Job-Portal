@@ -1,5 +1,6 @@
 "use client";
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 type Job = {
@@ -13,6 +14,11 @@ type Job = {
 
 const Home = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const router = useRouter();
+
+  const handleViewDetails = (job: Job) => {
+    router.push(`/jobs/${job.id}`);
+  }
 
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/jobs/all`)
@@ -38,7 +44,9 @@ const Home = () => {
             <p className="text-sm text-gray-500">
               {new Date(job.postedAt).toLocaleDateString()}
             </p>
-            <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer">
+            <button
+            onClick={() => handleViewDetails(job)}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer">
               View Details
             </button>
           </div>
