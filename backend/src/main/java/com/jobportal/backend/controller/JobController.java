@@ -6,8 +6,10 @@ import com.jobportal.backend.model.User;
 import com.jobportal.backend.repository.UserRepository;
 import com.jobportal.backend.service.JobService;
 import com.jobportal.backend.util.JwtUtil;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,27 +29,34 @@ public class JobController {
     @Autowired
     private JobService jobService;
 
+    // ✅ POST a new job
     @PostMapping
     public ResponseEntity<JobDto> postJob(@RequestBody @Valid JobRequest request, HttpServletRequest httpRequest) {
-        // 🔐 Extract token from header
         String authHeader = httpRequest.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(401).build(); // unauthorized
+            return ResponseEntity.status(401).build();
         }
 
         String token = authHeader.substring(7);
         String email = jwtUtil.extractUsername(token);
 
-        // 🔍 Find user from DB
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ Pass user to service
         JobDto job = jobService.postJob(request, user);
         return ResponseEntity.ok(job);
     }
-        @GetMapping("/all")
+
+    // ✅ GET all jobs
+    @GetMapping("/all")
     public ResponseEntity<List<JobDto>> getAllJobs() {
         return ResponseEntity.ok(jobService.getAllJobs());
+    }
+
+    // ✅ GET job by ID (for Job Details Page)
+    @GetMapping("/{id}")
+    public ResponseEntity<JobDto> getJobById(@PathVariable Long id) {
+        JobDto jobDto = jobService.getJobById(id);
+        return ResponseEntity.ok(jobDto);
     }
 }

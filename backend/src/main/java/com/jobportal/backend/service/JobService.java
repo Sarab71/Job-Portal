@@ -27,9 +27,20 @@ public class JobService {
                         job.getTitle(),
                         job.getDescription(),
                         job.getSkills(),
-                        job.getPostedBy().getName()
-                ))
+                        job.getPostedBy().getName()))
                 .collect(Collectors.toList());
+    }
+
+    public JobDto getJobById(Long id) {
+        Job job = jobRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job not found with id: " + id));
+
+        return new JobDto(
+                job.getId(),
+                job.getTitle(),
+                job.getDescription(),
+                job.getSkills(),
+                job.getPostedBy().getName());
     }
 
     public JobDto postJob(JobRequest request, User user) {
@@ -37,8 +48,7 @@ public class JobService {
                 request.title(),
                 request.description(),
                 request.skills(),
-                user
-        );
+                user);
 
         Job saved = jobRepository.save(job);
 
@@ -47,7 +57,6 @@ public class JobService {
                 saved.getTitle(),
                 saved.getDescription(),
                 saved.getSkills(),
-                saved.getPostedBy().getName()
-        );
+                saved.getPostedBy().getName());
     }
 }
